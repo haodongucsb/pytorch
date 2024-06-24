@@ -34,7 +34,7 @@ basic_gnn_edgecnn,pass,0
 
 
 
-basic_gnn_gcn,fail_to_run,0
+basic_gnn_gcn,pass,0
 
 
 
@@ -58,43 +58,43 @@ densenet121,pass,0
 
 
 
-detectron2_fasterrcnn_r_101_c4,eager_fail_to_run,0
+detectron2_fasterrcnn_r_101_c4,fail_to_run,0
 
 
 
-detectron2_fasterrcnn_r_101_dc5,eager_fail_to_run,0
+detectron2_fasterrcnn_r_101_dc5,fail_to_run,0
 
 
 
-detectron2_fasterrcnn_r_101_fpn,eager_fail_to_run,0
+detectron2_fasterrcnn_r_101_fpn,fail_to_run,0
 
 
 
-detectron2_fasterrcnn_r_50_c4,eager_fail_to_run,0
+detectron2_fasterrcnn_r_50_c4,fail_to_run,0
 
 
 
-detectron2_fasterrcnn_r_50_dc5,eager_fail_to_run,0
+detectron2_fasterrcnn_r_50_dc5,fail_to_run,0
 
 
 
-detectron2_fasterrcnn_r_50_fpn,eager_fail_to_run,0
+detectron2_fasterrcnn_r_50_fpn,fail_to_run,0
 
 
 
-detectron2_maskrcnn_r_101_c4,eager_fail_to_run,0
+detectron2_maskrcnn_r_101_c4,fail_to_run,0
 
 
 
-detectron2_maskrcnn_r_101_fpn,eager_fail_to_run,0
+detectron2_maskrcnn_r_101_fpn,fail_to_run,0
 
 
 
-detectron2_maskrcnn_r_50_c4,eager_fail_to_run,0
+detectron2_maskrcnn_r_50_c4,fail_to_run,0
 
 
 
-detectron2_maskrcnn_r_50_fpn,eager_fail_to_run,0
+detectron2_maskrcnn_r_50_fpn,pass,0
 
 
 
@@ -158,7 +158,7 @@ hf_T5,pass,0
 
 
 
-hf_T5_base,eager_fail_to_run,0
+hf_T5_base,pass,0
 
 
 
@@ -206,7 +206,7 @@ mobilenet_v2,pass,0
 
 
 
-mobilenet_v2_quantized_qat,model_fail_to_load,0
+mobilenet_v2_quantized_qat,fail_to_run,0
 
 
 
@@ -218,7 +218,7 @@ moco,fail_to_run,0
 
 
 
-moondream,model_fail_to_load,0
+moondream,pass,0
 
 
 
@@ -274,7 +274,7 @@ resnet50,pass,0
 
 
 
-resnet50_quantized_qat,model_fail_to_load,0
+resnet50_quantized_qat,fail_to_run,0
 
 
 
@@ -310,7 +310,15 @@ stable_diffusion_unet,pass_due_to_skip,0
 
 
 
+timm_efficientdet,model_fail_to_load,0
+
+
+
 timm_efficientnet,pass,0
+
+
+
+timm_nfnet,pass,0
 
 
 
