@@ -1,4 +1,5 @@
 # mypy: allow-untyped-defs
+import logging
 import operator
 
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -17,6 +18,8 @@ from torch.export.graph_signature import (
 )
 from torch.fx import subgraph_rewriter
 from torch.onnx.utils import _create_jit_graph
+
+log = logging.getLogger(__name__)
 
 
 def inplace_optimize_sym_size_div(gm: torch.fx.GraphModule):
@@ -676,7 +679,15 @@ class TS2FXGraphConverter:
         # matching converter for that.
         handler_func_name = ir_name_to_func_name(node_kind)
         handler_func = getattr(self, handler_func_name, self.convert_call_function_op)
-        handler_func(node)
+        
+        log_msg = f"Convert [{str(node)[:-1]}]\nConvert using [{handler_func.__name__}] "
+        try:
+            handler_func(node)
+        except Exception as e:
+            log_msg += "fails with {e}"
+            raise
+        log_msg += "succeeds"
+        log.debug(log_msg)
 
     def convert_graph_outputs(self):
         args = []
@@ -720,6 +731,7 @@ class TS2EPConverter:
     ):
         self.ts_model = ts_model
         self.ts_graph, self.params, _, _ = _create_jit_graph(ts_model, sample_args)
+        log.info(f"TorchScript graph\n\n{self.ts_graph}\n")
 
         self.sample_args = sample_args
         self.sample_kwargs = sample_kwargs
@@ -745,6 +757,7 @@ class TS2EPConverter:
             blocks_to_lifted_attrs,
         )
         gm = graph_converter.convert()
+        log.info("TS2EPConverter IR-to-IR conversion succeeds")
         ep = self.retrace_as_exported_program(gm, graph_converter.tensor_constants)
         return ep
 
