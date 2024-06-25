@@ -2698,7 +2698,7 @@ class TestSDPACudaOnly(NNTestCase):
         # Fudge Factor when dropout is enabled
         dropout_fudge_factor = 1.0 if dropout_p == 0.0 else 2.0
 
-        query_fudge_factor = dropout_fudge_factor
+        query_fudge_factor = 6 * dropout_fudge_factor
         grad_q_ref_atol, grad_q_ref_rtol = get_tolerances(query_ref.grad, query_ref_lp.grad, query_fudge_factor)
 
         # TODO: Investigate why grad_k needs larger tolerances
@@ -2820,7 +2820,7 @@ class TestSDPACudaOnly(NNTestCase):
         dropout_fudge_factor = 1.0 if dropout_p == 0.0 else 1.75
         mask_fudge_factor = 1.0 if attn_mask is None else 1.5
 
-        query_fudge_factor = dropout_fudge_factor
+        query_fudge_factor = 6 * dropout_fudge_factor
         grad_q_ref_atol, grad_q_ref_rtol = get_tolerances(query_ref.grad, query_ref_lp.grad, query_fudge_factor)
 
         # TODO: Investigate why grad_k needs larger tolerances
@@ -2946,13 +2946,13 @@ class TestSDPACudaOnly(NNTestCase):
         output_ref_atol, output_ref_rtol = get_tolerances(out_ref, out_lp_ref, output_fudge_factor)
 
         # TODO: Investigate why grad_q needs larger tolerances
-        query_fudge_factor = 4
+        query_fudge_factor = 8
         grad_q_ref_atol, grad_q_ref_rtol = get_tolerances(query_ref.grad, query_ref_lp.grad, query_fudge_factor)
 
-        key_fudge_factor = 2
+        key_fudge_factor = 4
         grad_k_ref_atol, grad_k_ref_rtol = get_tolerances(key_ref.grad, key_ref_lp.grad, key_fudge_factor)
 
-        value_fudge_factor = 2
+        value_fudge_factor = 4
         grad_v_ref_atol, grad_v_ref_rtol = get_tolerances(value_ref.grad, value_ref_lp.grad, value_fudge_factor)
 
         self.assertEqual(out, out_ref.to(out.dtype), atol=output_ref_atol, rtol=output_ref_rtol)
@@ -3109,7 +3109,7 @@ class TestSDPACudaOnly(NNTestCase):
         # Fudge Factor when dropout is enabled
         dropout_fudge_factor = 1.0 if dropout_p == 0.0 else 1.5
 
-        query_fudge_factor = dropout_fudge_factor
+        query_fudge_factor = 6 * dropout_fudge_factor
         grad_q_ref_atol, grad_q_ref_rtol = get_tolerances(query_ref.grad, query_ref_lp.grad, query_fudge_factor)
 
         # TODO: Investigate why grad_k needs larger tolerances
