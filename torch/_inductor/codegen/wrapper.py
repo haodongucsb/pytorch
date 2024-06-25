@@ -269,6 +269,9 @@ class EnterSubgraphLine(WrapperLine):
     wrapper: WrapperCodeGen
     graph: GraphLowering
 
+    def __post_init__(self) -> None:
+        self.wrapper.push_computed_sizes(self.wrapper.computed_sizes)
+
     def codegen(self, code: IndentedBuffer) -> None:
         self.wrapper.push_codegened_graph(self.graph)
         code.do_indent()
@@ -278,6 +281,9 @@ class EnterSubgraphLine(WrapperLine):
 class ExitSubgraphLine(WrapperLine):
     wrapper: WrapperCodeGen
 
+    def __post_init__(self) -> None:
+        self.wrapper.computed_sizes = self.wrapper.pop_computed_sizes()
+        
     def codegen(self, code: IndentedBuffer) -> None:
         self.wrapper.pop_codegened_graph()
         code.do_unindent()
@@ -488,6 +494,7 @@ class WrapperCodeGen(CodeGen):
         # including the graph instance into a cache key to avoid cross-graph
         # caching during lowering of nested subgraphs
         self.codegened_graph_stack = []
+        self.computed_sizes_stack = []
 
         self.write_header()
         self.write_prefix()
@@ -672,6 +679,13 @@ class WrapperCodeGen(CodeGen):
 
     def pop_codegened_graph(self):
         return self.codegened_graph_stack.pop()
+    
+    def push_computed_sizes(self, computed_sizes):
+        from copy import deepcopy
+        return self.computed_sizes_stack.append(deepcopy(computed_sizes))
+    
+    def pop_computed_sizes(self):
+        return self.computed_sizes_stack.pop()
 
     def next_kernel_suffix(self) -> str:
         return f"{next(self._names_iter)}"
