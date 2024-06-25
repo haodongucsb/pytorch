@@ -1343,6 +1343,9 @@ def xpassIfTorchDynamo(func):
 def xfailIfTorchDynamo(func):
     return unittest.expectedFailure(func) if TEST_WITH_TORCHDYNAMO else func  # noqa: F821
 
+def xfailIfSM90(func):
+    return unittest.expectedFailure(func) if torch.cuda.is_available() and torch.cuda.get_device_capability() == (9, 0) else func
+
 
 def skipIfTorchDynamo(msg="test doesn't currently work with dynamo"):
     """
