@@ -1,4 +1,5 @@
 # mypy: allow-untyped-defs
+import contextlib
 import copy
 import dataclasses
 import functools
@@ -211,8 +212,11 @@ def _decompose_exported_program(
         delattr(ep.graph_module, name)
     # TODO(zhxhchen17) Return the new graph_signature directly.
     from torch.export._trace import _ignore_backend_decomps
+    from torch._guards import detect_fake_mode
 
-    with _ignore_backend_decomps():
+    fake_mode = detect_fake_mode(fake_args)
+    fake_mode = contextlib.nullcontext() if fake_mode is None else fake_mode
+    with _ignore_backend_decomps(), fake_mode:
         gm, graph_signature = aot_export_module(
             ep.graph_module,
             fake_args,
