@@ -1504,6 +1504,7 @@ def _export(
 
     # Call the appropriate export function based on the strictness of tracing.
     export_func = _strict_export if strict else _non_strict_export
+
     export_artifact = export_func(
         mod,
         args,
@@ -1517,7 +1518,6 @@ def _export(
         _disable_forced_specializations,
         _is_torch_jit_trace,
     )
-
     # Decompose here for readability.
     gm = export_artifact.aten.gm
     export_graph_signature = export_artifact.aten.sig
