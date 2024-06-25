@@ -2521,7 +2521,11 @@ class CppCodeCache:
 
         _set_gpu_runtime_env()  # cpp_extension consults the env
 
-        from torch._inductor.cpp_builder import CppBuilder, CppTorchCudaOptions
+        from torch._inductor.cpp_builder import (
+            CppBuilder,
+            CppTorchCudaOptions,
+            get_name_and_dir_from_output_file_path,
+        )
 
         dummy_builder = CppBuilder(
             name="o", sources="i", BuildOption=CppTorchCudaOptions(**compile_command)
@@ -2538,10 +2542,18 @@ class CppCodeCache:
             from filelock import FileLock
 
             lock_path = os.path.join(get_lock_dir(), key + ".lock")
+            output_name, output_dir = get_name_and_dir_from_output_file_path(input_path)
+
+            """
+            TODO: remove output_path hard code path, after optimize circle import issue.
+            _worker_compile_cpp will use 'CppBuilder' as arg, and CppBuilder can calc output
+            path according Windows/Linux OS.
+            """
             output_path = input_path[:-3] + "so"
             future: Optional[Future[Any]] = None
             lib = None
-            worker_fn = functools.partial(
+            """
+             worker_fn = functools.partial(
                 _worker_compile_cpp,
                 lock_path,
                 input_path,
@@ -2549,6 +2561,16 @@ class CppCodeCache:
                 cpp_compile_command(
                     input=input_path, output=output_path, **compile_command
                 ),
+            )
+            """
+            worker_fn = functools.partial(
+                _worker_compile_cpp_new,
+                lock_path,
+                output_name,
+                input_path,
+                output_dir,
+                output_path,
+                compile_command,
             )
 
             def load_fn():
@@ -2574,6 +2596,35 @@ class CppCodeCache:
     @classmethod
     def load(cls, source_code: str, cuda: bool = False):
         return cls.load_async(source_code, cuda)()
+
+
+def _worker_compile_cpp_new(
+    lock_path, name, source, output_dir, output_path, args: dict[str, Any]
+):
+    from filelock import FileLock
+
+    from torch._inductor.cpp_builder import CppBuilder, CppTorchCudaOptions
+
+    cpp_build_option = CppTorchCudaOptions(**args)
+    cpp_builder = CppBuilder(
+        name=name,
+        sources=source,
+        output_dir=output_dir,
+        BuildOption=cpp_build_option,
+    )
+
+    with FileLock(lock_path, timeout=LOCK_TIMEOUT):
+        if not os.path.exists(cpp_builder.get_target_file_path()):
+            if config.is_fbcode():
+                cmd = cpp_builder.get_command_line()
+                compile_file(source, output_path, shlex.split(cmd))
+            else:
+                cpp_builder.build()
+
+
+"""
+TODO: remove the below code, after new cpp_builder stable.
+"""
 
 
 def _worker_compile_cpp(lock_path, input_path, output_path, cmd):
