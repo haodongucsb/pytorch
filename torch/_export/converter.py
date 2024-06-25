@@ -680,14 +680,12 @@ class TS2FXGraphConverter:
         handler_func_name = ir_name_to_func_name(node_kind)
         handler_func = getattr(self, handler_func_name, self.convert_call_function_op)
         
-        log_msg = f"Convert [{str(node)[:-1]}]\nConvert using [{handler_func.__name__}] "
+        log.debug(f"TS2EPConverter [{handler_func.__name__}] converts [{str(node)[:-1]}]")
         try:
             handler_func(node)
         except Exception as e:
-            log_msg += "fails with {e}"
+            log.info(f"TS2EPConverter conversion fails with {str(e)}")
             raise
-        log_msg += "succeeds"
-        log.debug(log_msg)
 
     def convert_graph_outputs(self):
         args = []
@@ -757,7 +755,7 @@ class TS2EPConverter:
             blocks_to_lifted_attrs,
         )
         gm = graph_converter.convert()
-        log.info("TS2EPConverter IR-to-IR conversion succeeds")
+        log.info("TS2EPConverter conversion succeeded")
         ep = self.retrace_as_exported_program(gm, graph_converter.tensor_constants)
         return ep
 
